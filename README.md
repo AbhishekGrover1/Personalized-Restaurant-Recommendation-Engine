@@ -1,29 +1,29 @@
-# Task-2 — Personalized Restaurant Recommendation Engine
+# Task-2 · Personalized Restaurant Recommendation Engine
 
 <p>
   <img src="https://img.shields.io/badge/Type-Content--Based%20Filtering-4A90D9?style=flat-square" />
-  <img src="https://img.shields.io/badge/Restaurants-9%2C551-FF6B35?style=flat-square" />
+  <img src="https://img.shields.io/badge/Corpus-9%2C551%20restaurants-FF6B35?style=flat-square" />
   <img src="https://img.shields.io/badge/Cities-141-2ECC71?style=flat-square" />
-  <img src="https://img.shields.io/badge/Scenarios%20Validated-3-lightgrey?style=flat-square" />
+  <img src="https://img.shields.io/badge/Validation%20Scenarios-3-lightgrey?style=flat-square" />
 </p>
 
 ---
 
 ## Overview
 
-A content-based restaurant recommendation engine that scores and ranks restaurants based on a user's stated preferences — cuisine type, budget tier, minimum acceptable rating, and preferred city. The system operates without any user interaction history and is driven entirely by restaurant feature attributes.
+A content-based restaurant recommendation engine that scores and ranks the full restaurant corpus against a user's stated preferences — cuisine type, budget tier, minimum acceptable rating, and preferred city. The system requires no prior interaction history and operates entirely on restaurant feature attributes, making it immediately deployable for new users and cold-start environments.
 
 ---
 
 ## Problem Statement
 
-Restaurant discovery platforms often require user interaction history to power collaborative filtering models. For new users or platforms with sparse interaction data, a content-based approach can surface relevant recommendations immediately using only restaurant characteristics.
+Collaborative filtering models depend on accumulated user interaction data, which is unavailable for new users or recently launched platforms. A content-based approach removes this dependency entirely: recommendations are derived from the intrinsic attributes of each restaurant, delivering relevant results from the first query.
 
 ---
 
 ## Objective
 
-Implement a weighted content-based filtering algorithm that accepts four user preference parameters and returns the top-N best-matching restaurants, with transparent, interpretable scoring.
+Design and implement a weighted content-based filtering algorithm that accepts four user preference parameters and returns the top-N best-matched restaurants with fully interpretable, normalized match scores.
 
 ---
 
@@ -32,9 +32,9 @@ Implement a weighted content-based filtering algorithm that accepts four user pr
 | Category | Tool |
 |----------|------|
 | Language | Python 3.9+ |
-| Data manipulation | pandas, numpy |
+| Data Manipulation | pandas, numpy |
 | Visualization | matplotlib, seaborn |
-| Notebook | Jupyter |
+| Environment | Jupyter Notebook |
 
 ---
 
@@ -55,93 +55,94 @@ jupyter>=1.0.0
 | Property | Value |
 |----------|-------|
 | File | `dataset/Dataset.csv` |
-| Total restaurants | 9,551 |
-| Rated restaurants used | 7,403 (0.0-rated excluded) |
-| Cities covered | 141 |
-| Unique cuisine combinations | 1,825+ |
-| Price range tiers | 1 (Cheap) to 4 (Premium) |
-| Rating range (filtered) | 0.5 to 4.9 |
+| Total Restaurants | 9,551 |
+| Rated Restaurants (used) | 7,403 · 0.0-rated records excluded |
+| Cities | 141 |
+| Unique Cuisine Combinations | 1,825+ |
+| Price Range Tiers | 1 (Budget) → 4 (Premium) |
+| Active Rating Range | 0.5 – 4.9 |
 
 ---
 
 ## Project Workflow
 
 ```
-Raw Dataset (9,551 rows)
+Raw Dataset  ·  9,551 rows
         │
         ▼
-1. Load and filter — remove 0.0-rated restaurants (Not Rated)
+ 01  Load and filter
+     Remove 0.0-rated records  →  7,403 restaurants retained
         │
         ▼
-2. Define user preference parameters:
-   cuisine_pref, budget_tier, min_rating, city_pref, top_n
+ 02  Define user preference parameters
+     cuisine_pref  ·  budget_tier  ·  min_rating  ·  city_pref  ·  top_n
         │
         ▼
-3. Compute match score for each restaurant using weighted formula
+ 03  Compute composite match score for every restaurant
+     using the weighted scoring formula
         │
         ▼
-4. Disqualify restaurants below min_rating (score → -1)
+ 04  Disqualify restaurants below min_rating
+     (score forced to -1 · excluded from ranking)
         │
         ▼
-5. Sort by score descending → return top-N results
+ 05  Sort by match score descending  →  return top-N results
         │
         ▼
-6. Validate across 3 test scenarios
+ 06  Validate output across 3 real-world test scenarios
 ```
 
 ---
 
 ## Machine Learning Techniques Used
 
-### Algorithm: Weighted Content-Based Filtering
+### Algorithm · Weighted Content-Based Filtering
 
-Each restaurant receives a composite match score:
+Every restaurant in the corpus receives a composite match score bounded to [0.0, 1.0]:
 
 ```
-score = 0.35 × cuisine_score
-      + 0.30 × rating_score
-      + 0.20 × budget_score
-      + 0.15 × city_score
+match_score  =  0.35 × cuisine_score
+              + 0.30 × rating_score
+              + 0.20 × budget_score
+              + 0.15 × city_score
 ```
 
-**Scoring rules:**
+### Scoring Logic
 
-| Criterion | Weight | Scoring Logic |
-|-----------|--------|---------------|
-| Cuisine match | 35% | 1.0 if preferred cuisine appears in restaurant's cuisines; 0.0 otherwise |
-| Rating score | 30% | `rating / 4.9` (normalized 0–1); restaurants below `min_rating` are excluded entirely |
-| Budget match | 20% | 1.0 (exact tier match) · 0.5 (adjacent tier) · 0.0 (far tier) |
-| City match | 15% | 1.0 (city matches) · 0.0 (city mismatch, still eligible) |
+| Criterion | Weight | Scoring Rule |
+|-----------|--------|--------------|
+| Cuisine | 35% | 1.0 if the preferred cuisine appears anywhere in the restaurant's cuisine string · 0.0 otherwise |
+| Rating | 30% | `rating ÷ 4.9` (normalized to 0–1) · restaurants below `min_rating` are excluded entirely |
+| Budget | 20% | 1.0 exact tier match · 0.5 adjacent tier · 0.0 more than one tier away |
+| City | 15% | 1.0 city matches preference · 0.0 city differs (restaurant remains eligible) |
 
-**Weight rationale:**
-- Cuisine carries the most weight (35%) as it is the most personal, non-negotiable preference
-- Rating (30%) ensures quality assurance
-- Budget (20%) is a practical hard constraint
-- City (15%) is soft — excellent restaurants surface even on city mismatches, enabling discovery
+### Weight Rationale
+
+Cuisine carries the highest weight (35%) because it represents the most personal and non-negotiable user preference. Rating (30%) enforces a quality floor. Budget (20%) reflects a practical financial constraint. City is deliberately soft-weighted (15%) to allow high-quality out-of-city restaurants to surface — supporting discovery over strict locality filtering.
 
 ---
 
 ## Results
 
-### Scenario Test Outputs
+### Scenario Validation
 
-| Scenario | Preferences | Top Result | Match Score |
-|----------|-------------|------------|-------------|
+| Scenario | User Preferences | Top Recommended Result | Match Score |
+|----------|-----------------|------------------------|-------------|
 | 1 | North Indian · Tier 2 · New Delhi · ≥ 3.5 | Food Scouts (rating 4.6) | 0.982 |
 | 2 | Italian · Tier 4 · Any city · ≥ 4.0 | Zolocrust – Hotel Clarks Amer (rating 4.9) | 1.000 |
 | 3 | Chinese · Tier 1 · Mumbai · ≥ 3.0 | Sheroes Hangout (rating 4.9) | 0.850 |
 
-All scenarios returned contextually relevant, sensible recommendations. Match scores are bounded [0.0, 1.0].
+All three scenarios returned contextually appropriate, high-quality recommendations. Match scores remained within the [0.0, 1.0] bound across the entire corpus.
 
 ### Qualitative Evaluation
 
-| Check | Result |
-|-------|--------|
-| Top results always meet minimum rating threshold | ✓ Pass |
-| Cuisine matching applied correctly (substring search) | ✓ Pass |
-| Budget adjacency logic works | ✓ Pass |
-| Match scores bounded 0.0 to 1.0 | ✓ Pass |
-| All 3 test scenarios returned relevant results | ✓ Pass |
+| Quality Check | Outcome |
+|---------------|---------|
+| All top results meet minimum rating threshold | ✓ Pass |
+| Cuisine matching via substring search applied correctly | ✓ Pass |
+| Budget adjacency logic executes correctly | ✓ Pass |
+| Match scores bounded to [0.0, 1.0] | ✓ Pass |
+| All 3 test scenarios returned relevant recommendations | ✓ Pass |
 
 ---
 
@@ -176,20 +177,20 @@ pip install -r ../requirements.txt
 
 ## Usage
 
-**Run the Python script:**
+**Execute the script:**
 
 ```bash
 python src/recommendation_engine.py
 ```
 
-**Use the `recommend()` function directly:**
+**Call the `recommend()` function directly:**
 
 ```python
 from src.recommendation_engine import recommend
 
 results = recommend(
     cuisine_pref='North Indian',
-    budget_tier=2,        # 1=cheap · 2=moderate · 3=expensive · 4=premium
+    budget_tier=2,       # 1 = Budget  ·  2 = Moderate  ·  3 = Expensive  ·  4 = Premium
     min_rating=3.5,
     city_pref='New Delhi',
     top_n=10
@@ -197,7 +198,7 @@ results = recommend(
 print(results)
 ```
 
-**Run the notebook:**
+**Launch the notebook:**
 
 ```bash
 jupyter notebook notebook.ipynb
@@ -207,16 +208,19 @@ jupyter notebook notebook.ipynb
 
 ## Future Improvements
 
-- Add collaborative filtering layer using implicit feedback data
-- Replace binary city match with Haversine distance scoring (lat/lon already present)
-- Vectorize cuisine descriptions with TF-IDF for partial match scoring
-- Add approximate nearest-neighbour indexing (Faiss, Annoy) for large-scale retrieval
-- Build an interactive web UI with Streamlit or FastAPI
+- Introduce a collaborative filtering layer driven by implicit user interaction signals
+- Replace the binary city match with Haversine distance scoring using the existing latitude/longitude columns
+- Apply TF-IDF vectorization to cuisine strings to enable soft, partial-match scoring
+- Integrate approximate nearest-neighbour indexing (Faiss, Annoy) for large-scale retrieval
+- Expose the engine via a Streamlit or FastAPI interface for interactive use
 
 ---
 
 ## Author
 
-**Abhishek** | Ref: CTI/A1/C358755
-BCA — Amity University Online, Noida, Uttar Pradesh
-Machine Learning Internship @ Cognifyz Technologies
+**Abhishek** · Ref: CTI/A1/C358755
+BCA · Amity University Online, Noida
+Machine Learning Internship · Cognifyz Technologies
+
+---
+---
