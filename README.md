@@ -9,9 +9,33 @@
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Objective](#objective)
+- [Technologies Used](#technologies-used)
+- [Python Libraries](#python-libraries)
+- [Dataset Information](#dataset-information)
+- [Project Workflow](#project-workflow)
+- [Machine Learning Techniques Used](#machine-learning-techniques-used)
+  - [Algorithm · Weighted Content-Based Filtering](#algorithm--weighted-content-based-filtering)
+  - [Scoring Logic](#scoring-logic)
+  - [Weight Rationale](#weight-rationale)
+- [Results](#results)
+  - [Scenario Validation](#scenario-validation)
+  - [Qualitative Evaluation](#qualitative-evaluation)
+- [Folder Structure](#folder-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Future Improvements](#future-improvements)
+- [Author](#author)
+
+---
+
 ## Overview
 
-A content-based restaurant recommendation engine that scores and ranks the full restaurant corpus against a user's stated preferences — cuisine type, budget tier, minimum acceptable rating, and preferred city. The system requires no prior interaction history and operates entirely on restaurant feature attributes, making it immediately deployable for new users and cold-start environments.
+This project implements a content-based restaurant recommendation engine that scores and ranks the full restaurant corpus against a user's stated preferences — cuisine type, budget tier, minimum acceptable rating, and preferred city. The system requires no prior interaction history and operates entirely on restaurant feature attributes, making it immediately deployable for new users and cold-start environments.
 
 ---
 
@@ -23,11 +47,13 @@ Collaborative filtering models depend on accumulated user interaction data, whic
 
 ## Objective
 
-Design and implement a weighted content-based filtering algorithm that accepts four user preference parameters and returns the top-N best-matched restaurants with fully interpretable, normalized match scores.
+To design and implement a weighted content-based filtering algorithm that accepts four user preference parameters and returns the top-N best-matched restaurants with fully interpretable, normalized match scores.
 
 ---
 
 ## Technologies Used
+
+The project is built on the following stack:
 
 | Category | Tool |
 |----------|------|
@@ -52,6 +78,8 @@ jupyter>=1.0.0
 
 ## Dataset Information
 
+The engine operates on the following dataset:
+
 | Property | Value |
 |----------|-------|
 | File | `dataset/Dataset.csv` |
@@ -65,6 +93,8 @@ jupyter>=1.0.0
 ---
 
 ## Project Workflow
+
+The end-to-end pipeline follows six sequential stages:
 
 ```
 Raw Dataset  ·  9,551 rows
@@ -109,6 +139,8 @@ match_score  =  0.35 × cuisine_score
 
 ### Scoring Logic
 
+Each criterion contributes to the final score as follows:
+
 | Criterion | Weight | Scoring Rule |
 |-----------|--------|--------------|
 | Cuisine | 35% | 1.0 if the preferred cuisine appears anywhere in the restaurant's cuisine string · 0.0 otherwise |
@@ -118,7 +150,7 @@ match_score  =  0.35 × cuisine_score
 
 ### Weight Rationale
 
-Cuisine carries the highest weight (35%) because it represents the most personal and non-negotiable user preference. Rating (30%) enforces a quality floor. Budget (20%) reflects a practical financial constraint. City is deliberately soft-weighted (15%) to allow high-quality out-of-city restaurants to surface — supporting discovery over strict locality filtering.
+Cuisine carries the highest weight (35%) because it represents the most personal and non-negotiable user preference. Rating (30%) enforces a quality floor, while budget (20%) reflects a practical financial constraint. City is deliberately soft-weighted (15%) to allow high-quality out-of-city restaurants to surface — supporting discovery over strict locality filtering.
 
 ---
 
@@ -126,15 +158,19 @@ Cuisine carries the highest weight (35%) because it represents the most personal
 
 ### Scenario Validation
 
+The engine was evaluated across three representative user scenarios:
+
 | Scenario | User Preferences | Top Recommended Result | Match Score |
 |----------|-----------------|------------------------|-------------|
 | 1 | North Indian · Tier 2 · New Delhi · ≥ 3.5 | Food Scouts (rating 4.6) | 0.982 |
 | 2 | Italian · Tier 4 · Any city · ≥ 4.0 | Zolocrust – Hotel Clarks Amer (rating 4.9) | 1.000 |
 | 3 | Chinese · Tier 1 · Mumbai · ≥ 3.0 | Sheroes Hangout (rating 4.9) | 0.850 |
 
-All three scenarios returned contextually appropriate, high-quality recommendations. Match scores remained within the [0.0, 1.0] bound across the entire corpus.
+All three scenarios returned contextually appropriate, high-quality recommendations, with match scores remaining within the [0.0, 1.0] bound across the entire corpus.
 
 ### Qualitative Evaluation
+
+A qualitative review confirmed the following:
 
 | Quality Check | Outcome |
 |---------------|---------|
@@ -207,6 +243,8 @@ jupyter notebook notebook.ipynb
 ---
 
 ## Future Improvements
+
+Potential directions for extending this project include:
 
 - Introduce a collaborative filtering layer driven by implicit user interaction signals
 - Replace the binary city match with Haversine distance scoring using the existing latitude/longitude columns
