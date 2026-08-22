@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Cities-141-2ECC71?style=flat-square" />
   <img src="https://img.shields.io/badge/Validation%20Scenarios-3-lightgrey?style=flat-square" />
 </p>
- 
+  
 ---
 
 ## Table of Contents
