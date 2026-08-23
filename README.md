@@ -1,6 +1,6 @@
 # Task-2 · Personalized Restaurant Recommendation Engine
 
-<p>
+<p> 
   <img src="https://img.shields.io/badge/Type-Content--Based%20Filtering-4A90D9?style=flat-square" />
   <img src="https://img.shields.io/badge/Corpus-9%2C551%20restaurants-FF6B35?style=flat-square" />
   <img src="https://img.shields.io/badge/Cities-141-2ECC71?style=flat-square" />
