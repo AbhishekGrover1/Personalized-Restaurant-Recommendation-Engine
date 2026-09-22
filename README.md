@@ -1,4 +1,4 @@
-# Task-2 · Personalized Restaurant Recommendation Engine
+ Personalized Restaurant Recommendation Engine
 
 <p> 
   <img src="https://img.shields.io/badge/Type-Content--Based%20Filtering-4A90D9?style=flat-square" />
